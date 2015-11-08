@@ -21,19 +21,11 @@ public class Maze {
 	public Maze(String filePath) {
 
 		String line = null;
-		int line_length = 0;
 		List<String> lines = new ArrayList<String>();
 		try (FileReader fr = new FileReader(new File(filePath));
 				BufferedReader br = new BufferedReader(fr)) {
-			if ((line = br.readLine()) != null) {
-				line_length = line.length();
-			}
 			while ((line = br.readLine()) != null) {
-				if (line.length() != line_length) {
-					lines.clear();
-					throw new FileNotFoundException();
-				}
-				lines.add(line);
+				lines.add(line.replace(",", ""));
 			}
 
 		} catch (FileNotFoundException e) {
@@ -45,7 +37,7 @@ public class Maze {
 		}
 
 		this.height = lines.size();
-		this.width = line_length;
+		this.width = lines.get(0).length();
 		this.maze = new Cell[height][width];
 
 		for (int row = 0; row < height; row++) {
@@ -61,12 +53,20 @@ public class Maze {
 	}
 
 	public Cell getCellAt(Point position) {
-		if (position.getxCoord() < this.height && position.getxCoord() >= 0
-				&& position.getyCoord() < this.width
-				&& position.getyCoord() >= 0) {
-			return this.maze[position.getxCoord()][position.getyCoord()];
+		int x = position.getxCoord();
+		int y = position.getyCoord();
+		if (x >= 0 && x < this.height && y >= 0 && y < this.width) {
+			return this.maze[x][y];
 		}
 		return null;
 	}
-	
+
+	public void print() {
+		for (int i = 0; i < this.height; i++) {
+			for (int j = 0; j < this.width; j++) {
+				System.out.print("[" + maze[i][j].getSymbol() + "]");
+			}
+			System.out.println();
+		}
+	}
 }

@@ -125,10 +125,12 @@ public class Cell {
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
 				if (i == 0 && j == 0)
-					// skip this.position
+					// skip current position
 					continue;
-				Point neighourPosition = new Point(this.position.getxCoord()
-						+ i, this.position.getyCoord() + j);
+				int x = this.position.getxCoord();
+				int y = this.position.getyCoord();
+				
+				Point neighourPosition = new Point(x + i, y + j);
 				if (owner.getCellAt(neighourPosition) != null) {
 					neighbours.add(owner.getCellAt(neighourPosition));
 				}
