@@ -1,17 +1,17 @@
 final class Point {
-	private final byte x;
-	private final byte y;
+	private final int x;
+	private final int y;
 
-	public Point(byte x, byte y) {
+	public Point(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
 
-	public byte getxCoord() {
+	public int getxCoord() {
 		return x;
 	}
 
-	public byte getyCoord() {
+	public int getyCoord() {
 		return y;
 	}
 
