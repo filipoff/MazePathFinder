@@ -4,7 +4,7 @@ public class Cell {
 	private char symbol;
 	private Point position;
 	private Cell parent;
-	private Board owner;
+	private Maze owner;
 	private int gCost;
 	private int hCost;
 	private boolean isInOpenedList;
@@ -25,7 +25,7 @@ public class Cell {
 		this.isWater = false;
 	}
 
-	public Cell(Board owner, char symbol, Point position) {
+	public Cell(Maze owner, char symbol, Point position) {
 		this.symbol = symbol;
 		this.position = position;
 		this.owner = owner;
@@ -38,11 +38,11 @@ public class Cell {
 		this.isWater = false;
 	}
 
-	public Board getOwner() {
+	public Maze getOwner() {
 		return owner;
 	}
 
-	public void setOwner(Board owner) {
+	public void setOwner(Maze owner) {
 		this.owner = owner;
 	}
 
