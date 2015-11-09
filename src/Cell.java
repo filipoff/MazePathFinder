@@ -5,21 +5,13 @@ public class Cell {
 	private Point position;
 	private Cell parent;
 	private Maze owner;
-	private int gCost;
-	private int hCost;
-	private boolean isInOpenedList;
-	private boolean isInClosedList;
 	private CellType type;
 
 	public Cell() {
 		this.symbol = 0;
 		this.position = new Point(0, 0);
-		this.gCost = 0;
-		this.hCost = 0;
 		this.parent = null;
 		this.owner = null;
-		this.isInOpenedList = false;
-		this.isInClosedList = false;
 		this.type = CellType.UNKNOWN;
 	}
 
@@ -27,11 +19,7 @@ public class Cell {
 		this.symbol = symbol;
 		this.position = position;
 		this.owner = owner;
-		this.gCost = 0;
-		this.hCost = 0;
 		this.parent = null;
-		this.isInOpenedList = false;
-		this.isInClosedList = false;
 		this.type = CellType.UNKNOWN;
 	}
 
@@ -45,14 +33,6 @@ public class Cell {
 
 	public void setType(CellType type) {
 		this.type = type;
-	}
-
-	public void setgCost(int gCost) {
-		this.gCost = gCost;
-	}
-
-	public void sethCost(int hCost) {
-		this.hCost = hCost;
 	}
 
 	public void setOwner(Maze owner) {
@@ -75,44 +55,12 @@ public class Cell {
 		this.position = position;
 	}
 
-	public int getgCost() {
-		return gCost;
-	}
-
-	public void setgCost(byte gCost) {
-		this.gCost = gCost;
-	}
-
-	public int gethCost() {
-		return hCost;
-	}
-
-	public void sethCost(byte hCost) {
-		this.hCost = hCost;
-	}
-
 	public Cell getParent() {
 		return parent;
 	}
 
 	public void setParent(Cell parent) {
 		this.parent = parent;
-	}
-
-	public boolean isInOpenedList() {
-		return isInOpenedList;
-	}
-
-	public void setInOpenedList(boolean isInOpenedList) {
-		this.isInOpenedList = isInOpenedList;
-	}
-
-	public boolean isInClosedList() {
-		return isInClosedList;
-	}
-
-	public void setInClosedList(boolean isInClosedList) {
-		this.isInClosedList = isInClosedList;
 	}
 
 	// TODO : hashCode and equals ?
