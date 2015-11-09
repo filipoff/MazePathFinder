@@ -9,8 +9,7 @@ public class Cell {
 	private int hCost;
 	private boolean isInOpenedList;
 	private boolean isInClosedList;
-	private boolean isPassable;
-	private boolean isWater;
+	private CellType type;
 
 	public Cell() {
 		this.symbol = 0;
@@ -21,8 +20,7 @@ public class Cell {
 		this.owner = null;
 		this.isInOpenedList = false;
 		this.isInClosedList = false;
-		this.isPassable = false;
-		this.isWater = false;
+		this.type = CellType.UNKNOWN;
 	}
 
 	public Cell(Maze owner, char symbol, Point position) {
@@ -34,12 +32,27 @@ public class Cell {
 		this.parent = null;
 		this.isInOpenedList = false;
 		this.isInClosedList = false;
-		this.isPassable = false;
-		this.isWater = false;
+		this.type = CellType.UNKNOWN;
 	}
 
 	public Maze getOwner() {
 		return owner;
+	}
+
+	public CellType getType() {
+		return type;
+	}
+
+	public void setType(CellType type) {
+		this.type = type;
+	}
+
+	public void setgCost(int gCost) {
+		this.gCost = gCost;
+	}
+
+	public void sethCost(int hCost) {
+		this.hCost = hCost;
 	}
 
 	public void setOwner(Maze owner) {
@@ -102,23 +115,16 @@ public class Cell {
 		this.isInClosedList = isInClosedList;
 	}
 
-	public boolean isPassable() {
-		return isPassable;
-	}
-
-	public void setPassable(boolean isPassable) {
-		this.isPassable = isPassable;
-	}
-
-	public boolean isWater() {
-		return isWater;
-	}
-
-	public void setWater(boolean isWater) {
-		this.isWater = isWater;
-	}
-
 	// TODO : hashCode and equals ?
+
+	private boolean isValidNeighbour(Cell neighbour) {
+		if ((neighbour != null)
+				&& (neighbour.type == CellType.PASSABLE
+						|| neighbour.type == CellType.WATER || neighbour.type == CellType.GOAL)) {
+			return true;
+		}
+		return false;
+	}
 
 	public ArrayList<Cell> getValidNeighbours() {
 		ArrayList<Cell> neighbours = new ArrayList<Cell>();
@@ -129,10 +135,10 @@ public class Cell {
 					continue;
 				int x = this.position.getxCoord();
 				int y = this.position.getyCoord();
-				
 				Point neighourPosition = new Point(x + i, y + j);
-				if (owner.getCellAt(neighourPosition) != null) {
-					neighbours.add(owner.getCellAt(neighourPosition));
+				Cell currentNeighbour = this.owner.getCellAt(neighourPosition);
+				if (isValidNeighbour(currentNeighbour)) {
+					neighbours.add(currentNeighbour);
 				}
 			}
 		}
