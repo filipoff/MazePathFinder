@@ -3,14 +3,12 @@ import java.util.ArrayList;
 public class Cell {
 	private char symbol;
 	private Point position;
-	private Cell parent;
 	private Maze owner;
 	private CellType type;
 
 	public Cell() {
 		this.symbol = 0;
 		this.position = new Point(0, 0);
-		this.parent = null;
 		this.owner = null;
 		this.type = CellType.UNKNOWN;
 	}
@@ -19,7 +17,6 @@ public class Cell {
 		this.symbol = symbol;
 		this.position = position;
 		this.owner = owner;
-		this.parent = null;
 		this.type = CellType.UNKNOWN;
 	}
 
@@ -53,14 +50,6 @@ public class Cell {
 
 	public void setPosition(Point position) {
 		this.position = position;
-	}
-
-	public Cell getParent() {
-		return parent;
-	}
-
-	public void setParent(Cell parent) {
-		this.parent = parent;
 	}
 
 	// TODO : hashCode and equals ?

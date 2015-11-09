@@ -11,6 +11,7 @@ public class Maze {
 	private int height;
 	private int width;
 	private Cell[][] maze;
+	private AStarPathFinder pathFinder;
 
 	public Maze() {
 		this.height = 0;
@@ -70,5 +71,10 @@ public class Maze {
 			}
 			System.out.println();
 		}
+	}
+
+	public void findPath(Point start, Point goal) {
+		pathFinder = new AStarPathFinder();
+		pathFinder.findPath(this, start, goal);
 	}
 }
