@@ -6,10 +6,16 @@ import java.util.PriorityQueue;
 public class AStarPathFinder {
 	private static final float STRAIGHT_COST = 1f;
 	private static final float DIAGONAL_COST = 1.5f;
-	private PriorityQueue<Cell> front;
-	private HashMap<Cell, Float> costFromStartOf;
-	private HashMap<Cell, Float> costToEndOf;
-	private HashMap<Cell, Cell> parentOf;
+
+	private PriorityQueue<CellPriorityPair> front;
+
+	// cost from start
+	private HashMap<Cell, Float> costToHere;
+
+	// whose parent of the current cell
+	private HashMap<Cell, Cell> cameFrom;
+
+	private HashMap<Cell, Boolean> isInspected;
 
 	private float heuristic(Cell start, Cell goal) {
 		int dx = Math.abs(start.getPosition().getxCoord()
@@ -21,72 +27,108 @@ public class AStarPathFinder {
 				* Math.min(dx, dy);
 	}
 
+	private float costBetween(Cell current, Cell neighbour) {
+
+		if (current.getType() == CellType.WATER)
+			// current is water cell, cost is 2
+			return 2f;
+		int xCordSubstraction = neighbour.getPosition().getxCoord()
+				- current.getPosition().getxCoord();
+		int yCordSubstraction = neighbour.getPosition().getyCoord()
+				- current.getPosition().getyCoord();
+
+		if (xCordSubstraction == 0 || yCordSubstraction == 0)
+			// the neighbour is a vertical/horizontal cell
+			return 1f;
+
+		else
+			// the neighbour is a diagonal cell
+			return 1.5f;
+
+	}
+
 	public List<Point> findPath(Maze maze, Point start, Point goal) {
 		List<Point> result = new ArrayList<Point>();
 
 		// initialize the data structures
-		costFromStartOf = new HashMap<Cell, Float>();
-		costToEndOf = new HashMap<Cell, Float>();
-		parentOf = new HashMap<Cell, Cell>();
-		front = new PriorityQueue<Cell>();
+		costToHere = new HashMap<Cell, Float>();
+		cameFrom = new HashMap<Cell, Cell>();
+		isInspected = new HashMap<Cell, Boolean>();
+		front = new PriorityQueue<CellPriorityPair>(10,
+				new CellPriorityPairComparator());
 
-		// get cell at start point
+		// get the start cell
 		Cell startCell = maze.getCellAt(start);
-		// get cell at goal point
+
+		// get the goal cell
 		Cell goalCell = maze.getCellAt(goal);
 
-		// add the start cell to the front
-		front.add(startCell);
+		// cost from start cell to start cell is 0
+		costToHere.put(startCell, 0f);
 
-		// set the cost from the start cell to the start (0)
-		costFromStartOf.put(startCell, 0f);
+		// parent of start cell is null
+		cameFrom.put(startCell, null);
 
-		// set the cost to the end cell from the start cell
-		costToEndOf.put(startCell, 0f + heuristic(startCell, goalCell));
+		// add the start cell to the front, with priority - estimated total cost
+		front.add(new CellPriorityPair(startCell,
+				heuristic(startCell, goalCell)));
 
-		// while there are still cells in the front
+		// while the front has cells to check
+
 		while (!front.isEmpty()) {
 
-			// get the cell with both the lowest cost from start and cost to end
-			Cell current = front.poll();
+			// get the cell with the lowest estimated total cost
+			Cell current = front.poll().getCell();
 
-			// the current cell is the goal cell
+			// if it's the goal, stop and fill the list with points that
+			// make the path
 			if (current == goalCell) {
-				while (parentOf.get(current) != null) {
-					result.add(current.getPosition());
+				while (cameFrom.get(current) != null) {
 					current.setSymbol('*');
+					result.add(current.getPosition());
+					current = cameFrom.get(current);
 				}
 				break;
 			}
 
-			// for each valid neighbour of the current cell
+			// mark the current cell as visited so it will
+			// not be checked again
+			isInspected.put(current, true);
+
+			// for every valid neighbour of the current cell
 			for (Cell neighbour : current.getValidNeighbours()) {
 
-				// calculate the cost from the start to this neighbour
-				float newCostFromStartToNeighbour = costFromStartOf
-						.get(current) + heuristic(current, neighbour);
+				// if it has been inspected, skip it
+				if (isInspected.containsKey(neighbour))
+					continue;
 
-				// if this neighbour is not visited, add it
-				// or if it is visited but this new path that is found
-				// is shorter than the current path to the neighbour
-				// set the current path of the neighbour with this new shorter
-				// path
-				if (!costFromStartOf.containsKey(neighbour)
-						|| newCostFromStartToNeighbour < costFromStartOf
-								.get(neighbour)) {
-					costFromStartOf.put(neighbour, newCostFromStartToNeighbour);
+				// calculated the cost from start to this neighbour
+				float neighbourNextCost = costToHere.get(current)
+						+ costBetween(current, neighbour);
+
+				// if this neighbour is newly discovered cell
+				// or if it's an already discovered cell
+				// but the newly calculated cost is less than
+				// the current cost to this neighbour
+				// meaning a shorter path is found to this neighbour
+
+				if (!costToHere.containsKey(neighbour)
+						|| neighbourNextCost < costToHere.get(neighbour)) {
+
+					// set it's cost from the start to this neighbour as the
+					// current shortest
+					costToHere.put(neighbour, neighbourNextCost);
+
+					// set it's parent to the current cell
+					cameFrom.put(neighbour, current);
+
+					// add this neighbour to the front
+					front.add(new CellPriorityPair(neighbour, neighbourNextCost
+							+ heuristic(neighbour, goalCell)));
+
 				}
-
-				// calculate the cost from this neighbour to the end
-				costToEndOf.put(neighbour, newCostFromStartToNeighbour
-						+ heuristic(neighbour, goalCell));
-
-				// set the parent of this neighbour to it's father
-				parentOf.put(neighbour, current);
-
-				// add this neighbour to the front
-				front.add(neighbour);
 			}
+
 		}
 		return result;
 
