@@ -12,10 +12,8 @@ public class AStarPathFinder {
 	// cost from start
 	private HashMap<Cell, Float> costToHere;
 
-	// whose parent of the current cell
+	// who's parent of the current cell
 	private HashMap<Cell, Cell> cameFrom;
-
-	private HashMap<Cell, Boolean> isInspected;
 
 	private float heuristic(Cell start, Cell goal) {
 		int dx = Math.abs(start.getPosition().getxCoord()
@@ -53,7 +51,6 @@ public class AStarPathFinder {
 		// initialize the data structures
 		costToHere = new HashMap<Cell, Float>();
 		cameFrom = new HashMap<Cell, Cell>();
-		isInspected = new HashMap<Cell, Boolean>();
 		front = new PriorityQueue<CellPriorityPair>(10,
 				new CellPriorityPairComparator());
 
@@ -62,6 +59,11 @@ public class AStarPathFinder {
 
 		// get the goal cell
 		Cell goalCell = maze.getCellAt(goal);
+
+		// if start or goal is invalid
+		// return empty list
+		if (startCell == null || goalCell == null)
+			return result;
 
 		// cost from start cell to start cell is 0
 		costToHere.put(startCell, 0f);
@@ -73,7 +75,8 @@ public class AStarPathFinder {
 		front.add(new CellPriorityPair(startCell,
 				heuristic(startCell, goalCell)));
 
-		// while the front has cells to check
+		
+		// while the front has cells to inspect
 
 		while (!front.isEmpty()) {
 
@@ -91,16 +94,8 @@ public class AStarPathFinder {
 				break;
 			}
 
-			// mark the current cell as visited so it will
-			// not be checked again
-			isInspected.put(current, true);
-
 			// for every valid neighbour of the current cell
 			for (Cell neighbour : current.getValidNeighbours()) {
-
-				// if it has been inspected, skip it
-				if (isInspected.containsKey(neighbour))
-					continue;
 
 				// calculated the cost from start to this neighbour
 				float neighbourNextCost = costToHere.get(current)
@@ -115,8 +110,7 @@ public class AStarPathFinder {
 				if (!costToHere.containsKey(neighbour)
 						|| neighbourNextCost < costToHere.get(neighbour)) {
 
-					// set it's cost from the start to this neighbour as the
-					// current shortest
+					// update this neighbour cost
 					costToHere.put(neighbour, neighbourNextCost);
 
 					// set it's parent to the current cell
