@@ -1,12 +1,15 @@
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.Stack;
 
 public class AStarPathFinder {
 	private static final float STRAIGHT_COST = 1f;
 	private static final float DIAGONAL_COST = 1.5f;
 
+	// front where cells are inspected
 	private PriorityQueue<CellPriorityPair> front;
 
 	// cost from start
@@ -15,14 +18,15 @@ public class AStarPathFinder {
 	// who's parent of the current cell
 	private HashMap<Cell, Cell> cameFrom;
 
-	private float heuristic(Cell start, Cell goal) {
-		int dx = Math.abs(start.getPosition().getxCoord()
+	private float heuristic(Cell current, Cell goal) {
+		int xDistance = Math.abs(current.getPosition().getxCoord()
 				- goal.getPosition().getxCoord());
-		int dy = Math.abs(start.getPosition().getyCoord()
+		int yDistance = Math.abs(current.getPosition().getyCoord()
 				- goal.getPosition().getyCoord());
 
-		return STRAIGHT_COST * (dx + dy) + (DIAGONAL_COST - 2 * STRAIGHT_COST)
-				* Math.min(dx, dy);
+		return STRAIGHT_COST * (xDistance + yDistance)
+				+ (DIAGONAL_COST - 2 * STRAIGHT_COST)
+				* Math.min(xDistance, yDistance);
 	}
 
 	private float costBetween(Cell current, Cell neighbour) {
@@ -75,7 +79,6 @@ public class AStarPathFinder {
 		front.add(new CellPriorityPair(startCell,
 				heuristic(startCell, goalCell)));
 
-		
 		// while the front has cells to inspect
 
 		while (!front.isEmpty()) {
@@ -86,10 +89,10 @@ public class AStarPathFinder {
 			// if it's the goal, stop and fill the list with points that
 			// make the path
 			if (current == goalCell) {
-				while (cameFrom.get(current) != null) {
+				result.add(current.getPosition());
+				while ((current = cameFrom.get(current)) != startCell) {
 					current.setSymbol('*');
 					result.add(current.getPosition());
-					current = cameFrom.get(current);
 				}
 				break;
 			}
@@ -113,7 +116,7 @@ public class AStarPathFinder {
 					// update this neighbour cost
 					costToHere.put(neighbour, neighbourNextCost);
 
-					// set it's parent to the current cell
+					// set or update this neighbour's parent
 					cameFrom.put(neighbour, current);
 
 					// add this neighbour to the front
@@ -124,6 +127,7 @@ public class AStarPathFinder {
 			}
 
 		}
+		Collections.reverse(result);
 		return result;
 
 	}

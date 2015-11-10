@@ -73,8 +73,8 @@ public class Maze {
 		}
 	}
 
-	public void findPath(Point start, Point goal) {
+	public List<Point> findPath(Point start, Point goal) {
 		pathFinder = new AStarPathFinder();
-		pathFinder.findPath(this, start, goal);
+		return pathFinder.findPath(this, start, goal);
 	}
 }
