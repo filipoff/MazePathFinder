@@ -3,7 +3,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.PriorityQueue;
-import java.util.Stack;
 
 public class AStarPathFinder {
 	private static final float STRAIGHT_COST = 1f;
@@ -34,12 +33,11 @@ public class AStarPathFinder {
 		if (current.getType() == CellType.WATER)
 			// current is water cell, cost is 2
 			return 2f;
-		int xCordSubstraction = neighbour.getPosition().getxCoord()
-				- current.getPosition().getxCoord();
-		int yCordSubstraction = neighbour.getPosition().getyCoord()
-				- current.getPosition().getyCoord();
 
-		if (xCordSubstraction == 0 || yCordSubstraction == 0)
+		if (current.getPosition().getxCoord() == neighbour.getPosition()
+				.getxCoord()
+				|| current.getPosition().getyCoord() == neighbour.getPosition()
+						.getyCoord())
 			// the neighbour is a vertical/horizontal cell
 			return 1f;
 
