@@ -23,5 +23,4 @@ public class CellPriorityPair {
 	public void setPriority(float priority) {
 		this.priority = priority;
 	}
-
 }

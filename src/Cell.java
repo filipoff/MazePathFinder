@@ -1,14 +1,20 @@
 public class Cell {
+	public abstract static class Properties {
+
+	}
+
 	private char symbol;
 	private Point position;
 	private Maze owner;
 	private CellType type;
+	protected Properties properties;
 
 	public Cell() {
 		this.symbol = 0;
 		this.position = new Point(0, 0);
 		this.owner = null;
 		this.type = CellType.UNKNOWN;
+		this.properties = null;
 	}
 
 	public Cell(Maze owner, char symbol, Point position, CellType type) {
@@ -16,6 +22,15 @@ public class Cell {
 		this.position = position;
 		this.owner = owner;
 		this.type = type;
+		this.properties = null;
+	}
+
+	public Properties getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 
 	public Maze getOwner() {

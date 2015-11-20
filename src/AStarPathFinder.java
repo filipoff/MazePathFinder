@@ -1,21 +1,55 @@
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class AStarPathFinder {
-	private static final float STRAIGHT_COST = 1f;
-	private static final float DIAGONAL_COST = 1.5f;
 
 	// front where cells are inspected
 	private PriorityQueue<CellPriorityPair> front;
 
-	// cost from start
-	private HashMap<Cell, Float> costToHere;
+	protected static class AStarCellProperties extends Cell.Properties {
+		// cost from start to this cell
+		public float costToHere;
 
-	// who's parent of the current cell
-	private HashMap<Cell, Cell> cameFrom;
+		// who's parent of the this cell
+		public Cell cameFrom;
+	}
+
+	protected void setCameFrom(Cell current, Cell parent) {
+		AStarCellProperties prop = (AStarCellProperties) current
+				.getProperties();
+		if (prop == null) {
+			prop = new AStarCellProperties();
+			current.setProperties(prop);
+		}
+		prop.cameFrom = parent;
+	}
+
+	protected Cell getCameFrom(Cell current) {
+		AStarCellProperties prop = (AStarCellProperties) current
+				.getProperties();
+		return prop.cameFrom;
+	}
+
+	protected void setCostToHere(Cell current, float cost) {
+		AStarCellProperties prop = (AStarCellProperties) current
+				.getProperties();
+		if (prop == null) {
+			prop = new AStarCellProperties();
+			current.setProperties(prop);
+		}
+		prop.costToHere = cost;
+	}
+
+	protected float getCostToHere(Cell current) {
+		AStarCellProperties prop = (AStarCellProperties) current
+				.getProperties();
+		if (prop == null) {
+			return -1;
+		}
+		return prop.costToHere;
+	}
 
 	private float heuristic(Cell current, Cell goal) {
 		int xDistance = Math.abs(current.getPosition().getxCoord()
@@ -23,38 +57,36 @@ public class AStarPathFinder {
 		int yDistance = Math.abs(current.getPosition().getyCoord()
 				- goal.getPosition().getyCoord());
 
-		return STRAIGHT_COST * (xDistance + yDistance)
-				+ (DIAGONAL_COST - 2 * STRAIGHT_COST)
+		return Constants.STRAIGHT_COST * (xDistance + yDistance)
+				+ (Constants.DIAGONAL_COST - 2 * Constants.STRAIGHT_COST)
 				* Math.min(xDistance, yDistance);
 	}
 
 	private float costBetween(Cell current, Cell neighbour) {
 
 		if (current.getType() == CellType.WATER)
-			// current is water cell, cost is 2
-			return 2f;
+			// current is water cell
+			return Constants.WATER_COST;
 
 		if (current.getPosition().getxCoord() == neighbour.getPosition()
 				.getxCoord()
 				|| current.getPosition().getyCoord() == neighbour.getPosition()
 						.getyCoord())
 			// the neighbour is a vertical/horizontal cell
-			return 1f;
+			return Constants.STRAIGHT_COST;
 
 		else
 			// the neighbour is a diagonal cell
-			return 1.5f;
+			return Constants.DIAGONAL_COST;
 
 	}
 
 	public List<Point> findPath(Maze maze, Point start, Point goal) {
 		List<Point> result = new ArrayList<Point>();
 
-		// initialize the data structures
-		costToHere = new HashMap<Cell, Float>();
-		cameFrom = new HashMap<Cell, Cell>();
-		front = new PriorityQueue<CellPriorityPair>(10,
-				new CellPriorityPairComparator());
+		// initialize the front
+		front = new PriorityQueue<CellPriorityPair>(
+				(p1, p2) -> (int) (p1.getPriority() - p2.getPriority()));
 
 		// get the start cell
 		Cell startCell = maze.getCellAt(start);
@@ -68,10 +100,10 @@ public class AStarPathFinder {
 			return result;
 
 		// cost from start cell to start cell is 0
-		costToHere.put(startCell, 0f);
+		setCostToHere(startCell, 0f);
 
 		// parent of start cell is null
-		cameFrom.put(startCell, null);
+		setCameFrom(startCell, null);
 
 		// add the start cell to the front, with priority - estimated total cost
 		front.add(new CellPriorityPair(startCell,
@@ -88,7 +120,7 @@ public class AStarPathFinder {
 			// make the path
 			if (current == goalCell) {
 				result.add(current.getPosition());
-				while ((current = cameFrom.get(current)) != startCell) {
+				while ((current = getCameFrom(current)) != startCell) {
 					current.setSymbol('*');
 					result.add(current.getPosition());
 				}
@@ -99,7 +131,7 @@ public class AStarPathFinder {
 			for (Cell neighbour : maze.getValidNeighboursOf(current)) {
 
 				// calculated the cost from start to this neighbour
-				float neighbourNextCost = costToHere.get(current)
+				float neighbourNextCost = getCostToHere(current)
 						+ costBetween(current, neighbour);
 
 				// if this neighbour is newly discovered cell
@@ -108,14 +140,14 @@ public class AStarPathFinder {
 				// the current cost to this neighbour
 				// meaning a shorter path is found to this neighbour
 
-				if (!costToHere.containsKey(neighbour)
-						|| neighbourNextCost < costToHere.get(neighbour)) {
+				if (getCostToHere(neighbour) == -1
+						|| neighbourNextCost < getCostToHere(neighbour)) {
 
 					// update this neighbour cost
-					costToHere.put(neighbour, neighbourNextCost);
+					setCostToHere(neighbour, neighbourNextCost);
 
 					// set or update this neighbour's parent
-					cameFrom.put(neighbour, current);
+					setCameFrom(neighbour, current);
 
 					// add this neighbour to the front
 					front.add(new CellPriorityPair(neighbour, neighbourNextCost
