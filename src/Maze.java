@@ -46,9 +46,8 @@ public class Maze {
 				Point currentPosition = new Point(row, column);
 				char currentSymbol = lines.get(row).charAt(column);
 				Cell currentCell = new Cell(this, currentSymbol,
-						currentPosition);
-				currentCell.setType(CellType
-						.getCellTypeForSymbol(currentSymbol));
+						currentPosition,
+						CellType.getCellTypeForSymbol(currentSymbol));
 				this.maze[row][column] = currentCell;
 			}
 		}

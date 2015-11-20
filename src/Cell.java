@@ -11,11 +11,11 @@ public class Cell {
 		this.type = CellType.UNKNOWN;
 	}
 
-	public Cell(Maze owner, char symbol, Point position) {
+	public Cell(Maze owner, char symbol, Point position, CellType type) {
 		this.symbol = symbol;
 		this.position = position;
 		this.owner = owner;
-		this.type = CellType.UNKNOWN;
+		this.type = type;
 	}
 
 	public Maze getOwner() {
