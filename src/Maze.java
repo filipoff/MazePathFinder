@@ -73,6 +73,35 @@ public class Maze {
 		}
 	}
 
+	private boolean isValidNeighbour(Cell neighbour) {
+		if ((neighbour != null)
+				&& (neighbour.getType() == CellType.PASSABLE
+						|| neighbour.getType() == CellType.WATER || neighbour
+						.getType() == CellType.GOAL)) {
+			return true;
+		}
+		return false;
+	}
+
+	public ArrayList<Cell> getValidNeighboursOf(Cell current) {
+		ArrayList<Cell> neighbours = new ArrayList<Cell>();
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (i == 0 && j == 0)
+					// skip current position
+					continue;
+				int x = current.getPosition().getxCoord();
+				int y = current.getPosition().getyCoord();
+				Point neighourPosition = new Point(x + i, y + j);
+				Cell neighbour = getCellAt(neighourPosition);
+				if (isValidNeighbour(neighbour)) {
+					neighbours.add(neighbour);
+				}
+			}
+		}
+		return neighbours;
+	}
+
 	public List<Point> findPath(Point start, Point goal) {
 		pathFinder = new AStarPathFinder();
 		return pathFinder.findPath(this, start, goal);

@@ -96,7 +96,7 @@ public class AStarPathFinder {
 			}
 
 			// for every valid neighbour of the current cell
-			for (Cell neighbour : current.getValidNeighbours()) {
+			for (Cell neighbour : maze.getValidNeighboursOf(current)) {
 
 				// calculated the cost from start to this neighbour
 				float neighbourNextCost = costToHere.get(current)

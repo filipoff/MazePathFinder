@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class Cell {
 	private char symbol;
 	private Point position;
@@ -50,35 +48,5 @@ public class Cell {
 
 	public void setPosition(Point position) {
 		this.position = position;
-	}
-
-	// TODO : hashCode and equals ?
-
-	private boolean isValidNeighbour(Cell neighbour) {
-		if ((neighbour != null)
-				&& (neighbour.type == CellType.PASSABLE
-						|| neighbour.type == CellType.WATER || neighbour.type == CellType.GOAL)) {
-			return true;
-		}
-		return false;
-	}
-
-	public ArrayList<Cell> getValidNeighbours() {
-		ArrayList<Cell> neighbours = new ArrayList<Cell>();
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				if (i == 0 && j == 0)
-					// skip current position
-					continue;
-				int x = this.position.getxCoord();
-				int y = this.position.getyCoord();
-				Point neighourPosition = new Point(x + i, y + j);
-				Cell currentNeighbour = this.owner.getCellAt(neighourPosition);
-				if (isValidNeighbour(currentNeighbour)) {
-					neighbours.add(currentNeighbour);
-				}
-			}
-		}
-		return neighbours;
 	}
 }
