@@ -10,7 +10,7 @@ public class AStarPathFinder {
 
 	protected static class AStarCellProperties extends Cell.Properties {
 		// cost from start to this cell
-		public float costToHere;
+		public int costToHere;
 
 		// who's parent of the this cell
 		public Cell cameFrom;
@@ -32,7 +32,7 @@ public class AStarPathFinder {
 		return prop.cameFrom;
 	}
 
-	protected void setCostToHere(Cell current, float cost) {
+	protected void setCostToHere(Cell current, int cost) {
 		AStarCellProperties prop = (AStarCellProperties) current
 				.getProperties();
 		if (prop == null) {
@@ -42,7 +42,7 @@ public class AStarPathFinder {
 		prop.costToHere = cost;
 	}
 
-	protected float getCostToHere(Cell current) {
+	protected int getCostToHere(Cell current) {
 		AStarCellProperties prop = (AStarCellProperties) current
 				.getProperties();
 		if (prop == null) {
@@ -51,7 +51,7 @@ public class AStarPathFinder {
 		return prop.costToHere;
 	}
 
-	private float heuristic(Cell current, Cell goal) {
+	private int heuristic(Cell current, Cell goal) {
 		int xDistance = Math.abs(current.getPosition().getxCoord()
 				- goal.getPosition().getxCoord());
 		int yDistance = Math.abs(current.getPosition().getyCoord()
@@ -62,7 +62,7 @@ public class AStarPathFinder {
 				* Math.min(xDistance, yDistance);
 	}
 
-	private float costBetween(Cell current, Cell neighbour) {
+	private int costBetween(Cell current, Cell neighbour) {
 
 		if (current.getType() == CellType.WATER)
 			// current is water cell
@@ -100,7 +100,7 @@ public class AStarPathFinder {
 			return result;
 
 		// cost from start cell to start cell is 0
-		setCostToHere(startCell, 0f);
+		setCostToHere(startCell, 0);
 
 		// parent of start cell is null
 		setCameFrom(startCell, null);
@@ -131,7 +131,7 @@ public class AStarPathFinder {
 			for (Cell neighbour : maze.getValidNeighboursOf(current)) {
 
 				// calculated the cost from start to this neighbour
-				float neighbourNextCost = getCostToHere(current)
+				int neighbourNextCost = getCostToHere(current)
 						+ costBetween(current, neighbour);
 
 				// if this neighbour is newly discovered cell
@@ -152,7 +152,6 @@ public class AStarPathFinder {
 					// add this neighbour to the front
 					front.add(new CellPriorityPair(neighbour, neighbourNextCost
 							+ heuristic(neighbour, goalCell)));
-
 				}
 			}
 

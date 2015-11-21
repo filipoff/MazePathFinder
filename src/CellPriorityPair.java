@@ -1,9 +1,9 @@
 public class CellPriorityPair {
 
 	private Cell cell;
-	private float priority;
+	private int priority;
 
-	public CellPriorityPair(Cell cell, float priority) {
+	public CellPriorityPair(Cell cell, int priority) {
 		this.cell = cell;
 		this.priority = priority;
 	}
@@ -16,11 +16,11 @@ public class CellPriorityPair {
 		this.cell = cell;
 	}
 
-	public float getPriority() {
+	public int getPriority() {
 		return priority;
 	}
 
-	public void setPriority(float priority) {
+	public void setPriority(int priority) {
 		this.priority = priority;
 	}
 }
