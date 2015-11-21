@@ -6,7 +6,7 @@ import java.util.PriorityQueue;
 public class AStarPathFinder {
 
 	// front where cells are inspected
-	private PriorityQueue<CellPriorityPair> front;
+	private PriorityQueue<Cell> front;
 
 	protected static class AStarCellProperties extends Cell.Properties {
 		// cost from start to this cell
@@ -110,8 +110,8 @@ public class AStarPathFinder {
 		List<Point> result = new ArrayList<Point>();
 
 		// initialize the front
-		front = new PriorityQueue<CellPriorityPair>(
-				(p1, p2) -> p1.getPriority() - p2.getPriority());
+		front = new PriorityQueue<Cell>((p1, p2) -> getPriority(p1)
+				- getPriority(p2));
 
 		// get the start cell
 		Cell startCell = maze.getCellAt(start);
@@ -130,16 +130,17 @@ public class AStarPathFinder {
 		// parent of start cell is null
 		setCameFrom(startCell, null);
 
-		// add the start cell to the front, with priority - estimated total cost
-		front.add(new CellPriorityPair(startCell,
-				heuristic(startCell, goalCell)));
+		// priority of the start cell is the estimated cost to the goal cell
+		setPriority(startCell, heuristic(startCell, goalCell));
 
+		// add the start cell to the front
+		front.add(startCell);
 		// while the front has cells to inspect
 
 		while (!front.isEmpty()) {
 
 			// get the cell with the lowest estimated total cost
-			Cell current = front.poll().getCell();
+			Cell current = front.poll();
 
 			// if it's the goal, stop and fill the list with points that
 			// make the path
@@ -174,9 +175,12 @@ public class AStarPathFinder {
 					// set or update this neighbour's parent
 					setCameFrom(neighbour, current);
 
+					// set priority of this neighbour
+					setPriority(neighbour,
+							neighbourNextCost + heuristic(neighbour, goalCell));
+
 					// add this neighbour to the front
-					front.add(new CellPriorityPair(neighbour, neighbourNextCost
-							+ heuristic(neighbour, goalCell)));
+					front.add(neighbour);
 
 				}
 			}
