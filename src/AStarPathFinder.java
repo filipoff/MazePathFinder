@@ -14,6 +14,28 @@ public class AStarPathFinder {
 
 		// who's parent of the this cell
 		public Cell cameFrom;
+
+		// priority of this cell, used by the front
+		public int priority;
+	}
+
+	protected void setPriority(Cell current, int priority) {
+		AStarCellProperties prop = (AStarCellProperties) current
+				.getProperties();
+		if (prop == null) {
+			prop = new AStarCellProperties();
+			current.setProperties(prop);
+		}
+		prop.priority = priority;
+	}
+
+	protected Integer getPriority(Cell current) {
+		AStarCellProperties prop = (AStarCellProperties) current
+				.getProperties();
+		if (prop == null) {
+			return null;
+		}
+		return prop.priority;
 	}
 
 	protected void setCameFrom(Cell current, Cell parent) {
@@ -29,6 +51,9 @@ public class AStarPathFinder {
 	protected Cell getCameFrom(Cell current) {
 		AStarCellProperties prop = (AStarCellProperties) current
 				.getProperties();
+		if (prop == null) {
+			return null;
+		}
 		return prop.cameFrom;
 	}
 
@@ -42,11 +67,11 @@ public class AStarPathFinder {
 		prop.costToHere = cost;
 	}
 
-	protected int getCostToHere(Cell current) {
+	protected Integer getCostToHere(Cell current) {
 		AStarCellProperties prop = (AStarCellProperties) current
 				.getProperties();
 		if (prop == null) {
-			return -1;
+			return null;
 		}
 		return prop.costToHere;
 	}
@@ -86,7 +111,7 @@ public class AStarPathFinder {
 
 		// initialize the front
 		front = new PriorityQueue<CellPriorityPair>(
-				(p1, p2) -> (int) (p1.getPriority() - p2.getPriority()));
+				(p1, p2) -> p1.getPriority() - p2.getPriority());
 
 		// get the start cell
 		Cell startCell = maze.getCellAt(start);
@@ -140,10 +165,10 @@ public class AStarPathFinder {
 				// the current cost to this neighbour
 				// meaning a shorter path is found to this neighbour
 
-				if (getCostToHere(neighbour) == -1
+				if (getCostToHere(neighbour) == null
 						|| neighbourNextCost < getCostToHere(neighbour)) {
 
-					// update this neighbour cost
+					// set or update this neighbour's cost
 					setCostToHere(neighbour, neighbourNextCost);
 
 					// set or update this neighbour's parent
@@ -152,6 +177,7 @@ public class AStarPathFinder {
 					// add this neighbour to the front
 					front.add(new CellPriorityPair(neighbour, neighbourNextCost
 							+ heuristic(neighbour, goalCell)));
+
 				}
 			}
 

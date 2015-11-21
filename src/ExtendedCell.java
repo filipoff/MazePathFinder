@@ -1,10 +1,18 @@
 public class ExtendedCell {
+	// reference to maze cell
 	private Cell cell;
-	private Cell cameFrom;
+
+	// parent of the current extended cell
+	private ExtendedCell cameFrom;
+
+	// cost from start to this extended cell
 	private int costToHere;
+
+	// priority, which is used by the priority queue for the search
 	private int priority;
 
-	public ExtendedCell(Cell cell, Cell cameFrom, int costToHere, int priority) {
+	public ExtendedCell(Cell cell, ExtendedCell cameFrom, int costToHere,
+			int priority) {
 		this.cell = cell;
 		this.cameFrom = cameFrom;
 		this.costToHere = costToHere;
@@ -19,11 +27,11 @@ public class ExtendedCell {
 		this.cell = cell;
 	}
 
-	public Cell getCameFrom() {
+	public ExtendedCell getCameFrom() {
 		return cameFrom;
 	}
 
-	public void setCameFrom(Cell cameFrom) {
+	public void setCameFrom(ExtendedCell cameFrom) {
 		this.cameFrom = cameFrom;
 	}
 
@@ -42,4 +50,5 @@ public class ExtendedCell {
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
+
 }
