@@ -30,7 +30,6 @@ public class Maze {
 			}
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -104,5 +103,14 @@ public class Maze {
 	public List<Point> findPath(Point start, Point goal) {
 		pathFinder = new AStarPathFinder();
 		return pathFinder.findPath(this, start, goal);
+	}
+
+	public void markPath(List<Point> path, char symbol) {
+		for (Point point : path) {
+			Cell current = getCellAt(point);
+			if (current != null) {
+				current.setSymbol(symbol);
+			}
+		}
 	}
 }

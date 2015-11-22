@@ -1,4 +1,5 @@
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
@@ -8,73 +9,14 @@ public class AStarPathFinder {
 	// front where cells are inspected
 	private PriorityQueue<Cell> front;
 
-	protected static class AStarCellProperties extends Cell.Properties {
-		// cost from start to this cell
-		public int costToHere;
+	// map of costs from start to given cell
+	private HashMap<Cell, Integer> costToHere;
 
-		// who's parent of the this cell
-		public Cell cameFrom;
+	// map of cells and and their parents
+	private HashMap<Cell, Cell> cameFrom;
 
-		// priority of this cell, used by the front
-		public int priority;
-	}
-
-	protected void setPriority(Cell current, int priority) {
-		AStarCellProperties prop = (AStarCellProperties) current
-				.getProperties();
-		if (prop == null) {
-			prop = new AStarCellProperties();
-			current.setProperties(prop);
-		}
-		prop.priority = priority;
-	}
-
-	protected Integer getPriority(Cell current) {
-		AStarCellProperties prop = (AStarCellProperties) current
-				.getProperties();
-		if (prop == null) {
-			return null;
-		}
-		return prop.priority;
-	}
-
-	protected void setCameFrom(Cell current, Cell parent) {
-		AStarCellProperties prop = (AStarCellProperties) current
-				.getProperties();
-		if (prop == null) {
-			prop = new AStarCellProperties();
-			current.setProperties(prop);
-		}
-		prop.cameFrom = parent;
-	}
-
-	protected Cell getCameFrom(Cell current) {
-		AStarCellProperties prop = (AStarCellProperties) current
-				.getProperties();
-		if (prop == null) {
-			return null;
-		}
-		return prop.cameFrom;
-	}
-
-	protected void setCostToHere(Cell current, int cost) {
-		AStarCellProperties prop = (AStarCellProperties) current
-				.getProperties();
-		if (prop == null) {
-			prop = new AStarCellProperties();
-			current.setProperties(prop);
-		}
-		prop.costToHere = cost;
-	}
-
-	protected Integer getCostToHere(Cell current) {
-		AStarCellProperties prop = (AStarCellProperties) current
-				.getProperties();
-		if (prop == null) {
-			return null;
-		}
-		return prop.costToHere;
-	}
+	// map of priorities of cells, used by the front
+	private HashMap<Cell, Integer> priority;
 
 	private int heuristic(Cell current, Cell goal) {
 		int xDistance = Math.abs(current.getPosition().getxCoord()
@@ -110,8 +52,14 @@ public class AStarPathFinder {
 		List<Point> result = new ArrayList<Point>();
 
 		// initialize the front
-		front = new PriorityQueue<Cell>((p1, p2) -> getPriority(p1)
-				- getPriority(p2));
+		// with comparator priorities 
+		front = new PriorityQueue<Cell>((p1, p2) -> priority.get(p1)
+				- priority.get(p2));
+
+		// initialize the maps
+		costToHere = new HashMap<>();
+		cameFrom = new HashMap<>();
+		priority = new HashMap<>();
 
 		// get the start cell
 		Cell startCell = maze.getCellAt(start);
@@ -125,18 +73,18 @@ public class AStarPathFinder {
 			return result;
 
 		// cost from start cell to start cell is 0
-		setCostToHere(startCell, 0);
+		costToHere.put(startCell, 0);
 
 		// parent of start cell is null
-		setCameFrom(startCell, null);
+		cameFrom.put(startCell, null);
 
 		// priority of the start cell is the estimated cost to the goal cell
-		setPriority(startCell, heuristic(startCell, goalCell));
+		priority.put(startCell, heuristic(startCell, goalCell));
 
 		// add the start cell to the front
 		front.add(startCell);
-		// while the front has cells to inspect
 
+		// while the front has cells to inspect
 		while (!front.isEmpty()) {
 
 			// get the cell with the lowest estimated total cost
@@ -146,8 +94,7 @@ public class AStarPathFinder {
 			// make the path
 			if (current == goalCell) {
 				result.add(current.getPosition());
-				while ((current = getCameFrom(current)) != startCell) {
-					current.setSymbol('*');
+				while ((current = cameFrom.get(current)) != startCell) {
 					result.add(current.getPosition());
 				}
 				break;
@@ -157,7 +104,7 @@ public class AStarPathFinder {
 			for (Cell neighbour : maze.getValidNeighboursOf(current)) {
 
 				// calculated the cost from start to this neighbour
-				int neighbourNextCost = getCostToHere(current)
+				int neighbourNextCost = costToHere.get(current)
 						+ costBetween(current, neighbour);
 
 				// if this neighbour is newly discovered cell
@@ -166,25 +113,23 @@ public class AStarPathFinder {
 				// the current cost to this neighbour
 				// meaning a shorter path is found to this neighbour
 
-				if (getCostToHere(neighbour) == null
-						|| neighbourNextCost < getCostToHere(neighbour)) {
+				if (!costToHere.containsKey(neighbour)
+						|| neighbourNextCost < costToHere.get(neighbour)) {
 
 					// set or update this neighbour's cost
-					setCostToHere(neighbour, neighbourNextCost);
+					costToHere.put(neighbour, neighbourNextCost);
 
 					// set or update this neighbour's parent
-					setCameFrom(neighbour, current);
+					cameFrom.put(neighbour, current);
 
 					// set priority of this neighbour
-					setPriority(neighbour,
+					priority.put(neighbour,
 							neighbourNextCost + heuristic(neighbour, goalCell));
 
 					// add this neighbour to the front
 					front.add(neighbour);
-
 				}
 			}
-
 		}
 		Collections.reverse(result);
 		return result;
